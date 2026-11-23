@@ -38,3 +38,9 @@ pip install -r requirements.txt
 ```bash
 python demo/test_libraries.py
 ```
+
+## 成员任务文档
+
+- [成员 A — 项目负责人 + 数据采集工程师](member_A.md)
+- [成员 B — 数据清洗与分析工程师](member_B.md)
+- [成员 C — 可视化与前端工程师](member_C.md)
