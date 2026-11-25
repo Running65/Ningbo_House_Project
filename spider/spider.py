@@ -28,7 +28,7 @@ HEADERS = {
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
 }
 OUTPUT_FILENAME = "raw_data.csv"
-DELAY_RANGE = (0.5, 1.5)          # 每页请求之间的随机延时（秒），避免被封
+DELAY_RANGE = (2.0, 3.0)          # 每页请求之间的随机延时（秒），避免被封
 RETRY_TIMES = 3                   # 单页失败重试次数
 TIMEOUT = 15                      # 请求超时（秒）
 
