@@ -10,6 +10,7 @@
 | 2026-11-24 | A | 帮我写宁波二手房爬虫，解析房源字段 | spider.py（解析字段存 CSV） | 单价字段多带「元/平」单位，与总价格式不一致 | 查 HTML 发现 unitPrice 的 span 自带「元/平」，用正则 clean_price 只保留数字 |
 | 2026-11-25 | A | 链家第2页起验证码，怎么绕过 | curl_cffi / Playwright 方案 | 各种伪装都绕不过，手动解验证码一直「小怪兽捣乱」 | 最终改用 Playwright CDP 接管真实 Chrome，登录后采集成功 |
 | 2026-11-25 | A | 贝壳第2页起要登录，怎么绕过登录采集 | CDP 接管真实 Chrome 方案 | 自动化浏览器被验证码识别，真实浏览器能正常登录 | 改用 CDP 接管真实 Chrome，登录后采集 1320 条 |
+| 2026-11-26 | A | 检查代码能否运行，逐个跑脚本 | 运行 analysis/dashboard_stats.py | 报 FileNotFoundError: '/tmp/stats.json' | 发现用了 Linux 路径 /tmp，反馈给 C，C 改成 analysis/stats.json 并提交 PR #23 |
 
 ## 排错案例（最终需 ≥3 个，每个写清楚）
 
@@ -40,6 +41,16 @@
 - **根本原因**：真实浏览器有真实的指纹和登录会话，反爬系统不触发验证码；而任何自动化浏览器都会留下可识别的痕迹。
 - **修复方案**：用 CDP 接管真实 Chrome，登录贝壳后翻页采集，遇到人机验证时人工完成一次，最终成功采集 **1320 条**房源（超过 1000 条要求）。
 - **经验总结**：对抗强反爬，最有效的不是「伪装得越来越像真人」，而是「直接用一个真实的东西」——真实浏览器（CDP）从根源上消除了识别点。这也是「换 IP 没用、换浏览器有用」的原因。
+
+---
+
+### 案例 4：检查代码运行时发现 dashboard_stats.py 用了 Linux 路径
+
+- **问题现象**：第 5 周「检查所有代码能否运行」时，运行 `analysis/dashboard_stats.py` 报错 `FileNotFoundError: No such file or directory: '/tmp/stats.json'`，脚本崩溃，导致后面的 `real_data.js` 生成代码执行不到。
+- **排查过程**：看报错堆栈定位到第 42 行 `with open('/tmp/stats.json', 'w')`；发现 `/tmp` 是 Linux/macOS 的临时目录，Windows 上不存在，所以文件打开失败。
+- **根本原因**：AI 生成的脚本带了 Unix 环境的路径假设（`/tmp`），在 Windows 上无法创建文件，脚本在生成核心产物前就崩溃了。
+- **修复方案**：把 `/tmp/stats.json` 改成项目内的相对路径 `analysis/stats.json`（Windows/macOS/Linux 通用）；反馈给成员 C，C 提交 PR #23 修复。
+- **经验总结**：检查代码能不能跑，不能只看语法（`py_compile` 通过 ≠ 能运行），要**实际运行一遍**；AI 生成的代码可能带 Unix 环境假设，Windows 上要留意路径写法。
 
 ---
 
