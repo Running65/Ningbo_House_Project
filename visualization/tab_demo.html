@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <title>宁波市二手房市场价格洞察大屏 — Tab 布局版</title>
   <script src="./echarts.min.js"></script>
+  <script src="./real_data.js"></script>
+  <script src="./ningbo_geo.js"></script>
   <style>
     :root {
       --bg: #0f1c3f;
@@ -108,10 +110,10 @@
   </header>
 
   <div class="kpi-row">
-    <div class="kpi"><div class="label">在售房源总数</div><div class="value cyan">1320</div></div>
-    <div class="kpi"><div class="label">全市平均单价 (元/㎡)</div><div class="value gold">17,842</div></div>
-    <div class="kpi"><div class="label">单价中位数 (元/㎡)</div><div class="value gold">16,530</div></div>
-    <div class="kpi"><div class="label">覆盖行政区数</div><div class="value orange">10</div></div>
+    <div class="kpi"><div class="label">在售房源总数</div><div class="value cyan">1195</div></div>
+    <div class="kpi"><div class="label">全市平均单价 (元/㎡)</div><div class="value gold">14,260</div></div>
+    <div class="kpi"><div class="label">单价中位数 (元/㎡)</div><div class="value gold">12,738</div></div>
+    <div class="kpi"><div class="label">覆盖行政区数</div><div class="value orange">11</div></div>
   </div>
 
   <div class="tabs">
@@ -159,37 +161,13 @@
   <footer>数据来源：贝壳找房·宁波站（2026-11-25 采集，仅供课程学习） · 可视化：成员 C</footer>
 
 <script>
-// ============ 假数据：字段口径与 docs/数据字段说明.md 一致，待 B 的 clean_data.csv 替换 ============
-const districtAvg = [
-  ['鄞州', 21500], ['海曙', 20800], ['江北', 18600], ['镇海', 15200],
-  ['北仑', 14500], ['奉化', 11800], ['象山', 11200], ['宁海', 10800]
-];
-const priceRanges = [
-  { value: 420, name: '<100万' },
-  { value: 380, name: '100-150万' },
-  { value: 260, name: '150-200万' },
-  { value: 180, name: '200-300万' },
-  { value: 60,  name: '300-500万' },
-  { value: 20,  name: '>500万' }
-];
-const scatterData = [];
-for (let i = 0; i < 50; i++) {
-  const area = Math.round(30 + Math.random() * 150);
-  scatterData.push([area, Math.round(26000 - area * 60 + (Math.random() - .5) * 6000)]);
-}
-const boxData = [
-  [12000, 15000, 18000, 21000, 26000],
-  [11000, 14000, 17000, 20000, 25000],
-  [10000, 13000, 16000, 19000, 24000],
-  [9000, 11000, 14000, 17000, 22000],
-  [8000, 10000, 12000, 15000, 20000]
-];
-const corrLabels = ['总价(万)', '单价(元/平)', '面积'];
-const corrData = [
-  [0, 0, 1.0], [0, 1, 0.62], [0, 2, 0.85],
-  [1, 0, 0.62], [1, 1, 1.0], [1, 2, 0.31],
-  [2, 0, 0.85], [2, 1, 0.31], [2, 2, 1.0]
-];
+// ============ 真实数据：由 analysis/dashboard_stats.py 生成（data/raw/raw_data.csv，1195 条） ============
+const districtAvg = DISTRICT_AVG;          // [行政区, 平均单价, 房源数]，按均价降序
+const priceRanges = PRICE_RANGES;          // 总价分箱（B 建议口径：≤80 / 80-150 / 150-300 / >300 万）
+const scatterData = SCATTER;               // 面积 × 单价，全量 1195 点
+const boxData = BOX;                       // 各区五数概括 [min,q1,中位数,q3,max]
+const corrLabels = CORR_LABELS;
+const corrData = CORR.flatMap((row, i) => row.map((v, j) => [i, j, v]));
 
 const dark = {
   textStyle: { color: '#8ea0c4' },
@@ -200,7 +178,7 @@ const charts = {};
 charts.chart1 = echarts.init(document.getElementById('chart1'));
 charts.chart1.setOption({
   ...dark,
-  tooltip: { ...dark.tooltip, trigger: 'axis' },
+  tooltip: { ...dark.tooltip, trigger: 'axis', formatter: p => `${p[0].name}：均价 ${p[0].value} 元/㎡，${districtAvg[p[0].dataIndex][2]} 套在售` },
   grid: { left: 60, right: 10, top: 20, bottom: 40 },
   xAxis: { type: 'category', data: districtAvg.map(d => d[0]), axisLabel: { color: '#8ea0c4', rotate: 30 } },
   yAxis: { type: 'value', name: '元/㎡', axisLabel: { color: '#8ea0c4' } },
@@ -227,7 +205,7 @@ charts.chart3.setOption({
   xAxis: { type: 'value', name: '面积(平米)', axisLabel: { color: '#8ea0c4' } },
   yAxis: { type: 'value', name: '单价(元/平)', axisLabel: { color: '#8ea0c4' } },
   visualMap: {
-    min: 8000, max: 26000, dimension: 1,
+    min: 3000, max: 45000, dimension: 1,
     inRange: { color: ['#37c6ff', '#f6c344', '#ff9c6e'] },
     textStyle: { color: '#8ea0c4' }, show: false
   },
@@ -239,16 +217,16 @@ charts.chart4.setOption({
   ...dark,
   tooltip: { ...dark.tooltip, trigger: 'item' },
   grid: { left: 60, right: 10, top: 20, bottom: 40 },
-  xAxis: { type: 'category', data: ['鄞州', '海曙', '江北', '镇海', '北仑'], axisLabel: { color: '#8ea0c4', rotate: 30 } },
+  xAxis: { type: 'category', data: districtAvg.map(d => d[0]), axisLabel: { color: '#8ea0c4', rotate: 30 } },
   yAxis: { type: 'value', name: '元/㎡', axisLabel: { color: '#8ea0c4' } },
-  series: [{ type: 'boxplot', data: boxData,
+  series: [{ type: 'boxplot', data: districtAvg.map(d => boxData[d[0]]),
     itemStyle: { color: '#16264d', borderColor: '#37c6ff' } }]
 });
 
 charts.chart5 = echarts.init(document.getElementById('chart5'));
 charts.chart5.setOption({
   ...dark,
-  tooltip: { ...dark.tooltip, formatter: p => `${corrLabels[p.value[0]]} × ${corrLabels[p.value[1]]}：${p.value[2]}` },
+  tooltip: { ...dark.tooltip, formatter: p => `${corrLabels[p.value[0]]} × ${corrLabels[p.value[1]]}：${p.value[2].toFixed(4)}` },
   grid: { left: 90, right: 20, top: 20, bottom: 60 },
   xAxis: { type: 'category', data: corrLabels, axisLabel: { color: '#8ea0c4', rotate: 30 } },
   yAxis: { type: 'category', data: corrLabels, axisLabel: { color: '#8ea0c4' } },
@@ -257,30 +235,30 @@ charts.chart5.setOption({
     inRange: { color: ['#37c6ff', '#16264d', '#ff9c6e'] },
     textStyle: { color: '#8ea0c4' }, orient: 'horizontal', left: 'center', bottom: 0
   },
-  series: [{ type: 'heatmap', data: corrData, label: { show: true, color: '#e8eefc' } }]
+  series: [{ type: 'heatmap', data: corrData, label: { show: true, color: '#e8eefc', formatter: p => p.value[2].toFixed(4) } }]
 });
 
-// Tab 6 的占位放在区域分析页
+// Tab 2 的行政区真实地图（边界：阿里云 DataV geoJSON；前湾新区无官方边界，不涂色）
 charts.chart6 = echarts.init(document.getElementById('chart6'));
+echarts.registerMap('ningbo', NINGBO_GEO);
 charts.chart6.setOption({
   ...dark,
-  tooltip: { ...dark.tooltip },
-  grid: { left: 60, right: 30, top: 30, bottom: 40 },
-  xAxis: { type: 'value', axisLabel: { color: '#8ea0c4' } },
-  yAxis: { type: 'category', data: districtAvg.map(d => d[0]).reverse(), axisLabel: { color: '#e8eefc' } },
+  tooltip: { ...dark.tooltip, formatter: p => `${p.name}：${p.value != null && !isNaN(p.value) ? '均价 ' + p.value + ' 元/㎡，' + p.data.count + ' 套在售' : '无边界数据'}` },
   visualMap: {
-    min: 10000, max: 22000,
+    min: 6000, max: 23000,
     inRange: { color: ['#37c6ff', '#f6c344', '#ff9c6e'] },
     textStyle: { color: '#8ea0c4' }
   },
   series: [{
-    type: 'bar', data: districtAvg.map(d => d[1]).reverse(),
-    itemStyle: { borderRadius: [0, 3, 3, 0] },
-    label: { show: true, position: 'right', color: '#8ea0c4' }
+    type: 'map', map: 'ningbo', roam: true,
+    data: districtAvg.map(d => ({ name: d[0], value: d[1], count: d[2] })),
+    label: { show: true, color: '#e8eefc', fontSize: 10 },
+    itemStyle: { areaColor: '#1a2a55', borderColor: '#0f1c3f' },
+    emphasis: { label: { color: '#f6c344' } }
   }],
   graphic: [{
     type: 'text', right: 20, top: 10,
-    style: { text: 'geoJSON 验证后升级为真实地图', fill: '#ff9c6e', fontSize: 12 }
+    style: { text: '前湾新区无官方边界数据，未着色', fill: '#ff9c6e', fontSize: 12 }
   }]
 });
 
