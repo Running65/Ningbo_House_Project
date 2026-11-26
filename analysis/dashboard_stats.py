@@ -39,7 +39,8 @@ corr = df[cols].corr(method='pearson')
 stats['corrLabels'] = ['总价(万)', '单价(元/平)', '面积']
 stats['corr'] = [[float(corr.iloc[i, j]) for j in range(3)] for i in range(3)]
 
-with open('/tmp/stats.json', 'w', encoding='utf-8') as f:
+# 中间产物仅供调试查看；Windows/macOS/Linux 通用（原 /tmp/ 路径 Windows 跑不了）
+with open('analysis/stats.json', 'w', encoding='utf-8') as f:
     json.dump(stats, f, ensure_ascii=False, indent=1)
 
 # 同步生成大屏引用的数据文件（analysis.py → 图表统计数据 的交付形式）
