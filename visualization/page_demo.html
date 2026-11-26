@@ -2,25 +2,25 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>宁波市二手房市场价格洞察大屏 — Page 布局版</title>
+  <title>宁波市二手房市场价格洞察 — Page 布局 · 深色版</title>
   <script src="./echarts.min.js"></script>
   <script src="./real_data.js"></script>
   <script src="./ningbo_geo.js"></script>
   <style>
     :root {
-      --bg: #0f1c3f;
-      --card: #16264d;
-      --gold: #f6c344;
-      --cyan: #37c6ff;
-      --orange: #ff9c6e;
-      --grey: #8ea0c4;
-      --text: #e8eefc;
+      --bg: #0d1117;
+      --card: #161b22;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --line: #21262d;
+      --accent: #58a6ff;
+      --gold: #d29922;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -30,82 +30,76 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 14px 24px 10px;
-      border-bottom: 2px solid transparent;
-      border-image: linear-gradient(90deg, var(--cyan), var(--gold), transparent) 1;
+      padding: 18px 28px 14px;
+      border-bottom: 1px solid var(--line);
     }
-    header h1 { font-size: 26px; letter-spacing: 2px; }
-    header h1 span { color: var(--gold); }
-    header .meta { color: var(--grey); font-size: 13px; }
+    header h1 { font-size: 22px; font-weight: 600; letter-spacing: .5px; }
+    header h1 span { color: var(--accent); }
+    header .meta { color: var(--muted); font-size: 13px; }
     /* KPI 栏 */
     .kpi-row {
       display: flex;
       gap: 16px;
-      padding: 12px 24px;
+      padding: 16px 28px 0;
     }
     .kpi {
       flex: 1;
       background: var(--card);
-      border-radius: 8px;
-      padding: 12px 18px;
-      border: 1px solid rgba(55, 198, 255, .25);
+      border-radius: 10px;
+      padding: 14px 18px;
+      border: 1px solid var(--line);
     }
-    .kpi .label { color: var(--grey); font-size: 13px; }
-    .kpi .value { font-size: 30px; font-weight: bold; margin-top: 4px; }
-    .kpi .value.gold { color: var(--gold); }
-    .kpi .value.cyan { color: var(--cyan); }
-    .kpi .value.orange { color: var(--orange); }
+    .kpi .label { color: var(--muted); font-size: 13px; }
+    .kpi .value { font-size: 28px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+    .kpi .value.accent { color: var(--accent); }
     /* 三列图表区 */
     .grid {
       flex: 1;
       display: grid;
       grid-template-columns: 27% 40% 27%;
-      gap: 14px;
-      padding: 0 24px 12px;
+      gap: 16px;
+      padding: 16px 28px;
     }
-    .col { display: flex; flex-direction: column; gap: 14px; }
+    .col { display: flex; flex-direction: column; gap: 16px; }
     .panel {
       background: var(--card);
-      border-radius: 8px;
-      border: 1px solid rgba(55, 198, 255, .18);
+      border-radius: 10px;
+      border: 1px solid var(--line);
       display: flex;
       flex-direction: column;
       min-height: 0;
     }
     .panel h2 {
-      font-size: 15px;
-      padding: 8px 14px 0;
-      color: var(--cyan);
-      font-weight: normal;
+      font-size: 14px;
+      padding: 12px 16px 0;
+      color: var(--muted);
+      font-weight: 600;
     }
     .panel .chart { flex: 1; min-height: 0; }
     /* 中间地图为主视觉，占最大区块 */
     .panel.map { flex: 1.6; }
-    .panel.placeholder-note {
-      color: var(--grey);
-    }
     /* 页脚 */
     footer {
       text-align: center;
-      color: var(--grey);
+      color: var(--muted);
       font-size: 12px;
-      padding: 8px 0 10px;
-      border-top: 1px solid rgba(142, 160, 196, .2);
+      padding: 10px 0 12px;
+      border-top: 1px solid var(--line);
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>宁波市二手房市场价格<span>洞察</span>大屏</h1>
+    <h1>宁波市二手房市场价格<span>洞察</span></h1>
     <div class="meta">数据截至 2026-11-25 · 宁波二手房项目小组（成员 A/B/C）</div>
   </header>
 
-  <!-- KPI 指标卡：数据为占位假数据，字段口径与《数据字段说明》一致 -->
+  <!-- KPI 指标卡：数值由 analysis/dashboard_stats.py 从真实数据计算 -->
   <div class="kpi-row">
-    <div class="kpi"><div class="label">在售房源总数</div><div class="value cyan">1195</div></div>
-    <div class="kpi"><div class="label">全市平均单价 (元/㎡)</div><div class="value gold">14,260</div></div>
-    <div class="kpi"><div class="label">单价中位数 (元/㎡)</div><div class="value gold">12,738</div></div>
-    <div class="kpi"><div class="label">覆盖行政区数</div><div class="value orange">11</div></div>
+    <div class="kpi"><div class="label">在售房源总数</div><div class="value">1,195</div></div>
+    <div class="kpi"><div class="label">全市平均单价 (元/㎡)</div><div class="value accent">14,260</div></div>
+    <div class="kpi"><div class="label">单价中位数 (元/㎡)</div><div class="value">12,738</div></div>
+    <div class="kpi"><div class="label">覆盖行政区数</div><div class="value" style="color: var(--gold)">11</div></div>
   </div>
 
   <div class="grid">
@@ -157,108 +151,112 @@ const boxData = BOX;                       // 各区五数概括 [min,q1,中位�
 const corrLabels = CORR_LABELS;
 const corrData = CORR.flatMap((row, i) => row.map((v, j) => [i, j, v]));
 
-const dark = {
-  textStyle: { color: '#8ea0c4' },
-  tooltip: { backgroundColor: '#16264d', borderColor: '#37c6ff', textStyle: { color: '#e8eefc' } }
+// ---- 深色低饱和主题 ----
+const AXIS = '#8b949e', TEXT = '#e6edf3', ACCENT = '#58a6ff', GOLD = '#d29922';
+const CARD = '#161b22', LINEC = '#21262d';
+const theme = {
+  textStyle: { color: AXIS },
+  tooltip: { backgroundColor: '#1c2128', borderColor: '#30363d', textStyle: { color: TEXT },
+             extraCssText: 'box-shadow: 0 4px 12px rgba(0,0,0,.4); border-radius: 8px;' }
 };
 const charts = {};
 
 // 图 1：各区均价柱状图（Tooltip + DataZoom）
 charts.chart1 = echarts.init(document.getElementById('chart1'));
 charts.chart1.setOption({
-  ...dark,
-  tooltip: { ...dark.tooltip, trigger: 'axis', formatter: p => `${p[0].name}：均价 ${p[0].value} 元/㎡，${districtAvg[p[0].dataIndex][2]} 套在售` },
+  ...theme,
+  tooltip: { ...theme.tooltip, trigger: 'axis', formatter: p => `${p[0].name}：均价 ${p[0].value} 元/㎡，${districtAvg[p[0].dataIndex][2]} 套在售` },
   grid: { left: 60, right: 10, top: 20, bottom: 40 },
-  xAxis: { type: 'category', data: districtAvg.map(d => d[0]), axisLabel: { color: '#8ea0c4', rotate: 30 } },
-  yAxis: { type: 'value', name: '元/㎡', axisLabel: { color: '#8ea0c4' } },
+  xAxis: { type: 'category', data: districtAvg.map(d => d[0]), axisLabel: { color: AXIS, rotate: 30 }, axisLine: { lineStyle: { color: LINEC } }, axisTick: { show: false } },
+  yAxis: { type: 'value', name: '元/㎡', axisLabel: { color: AXIS }, splitLine: { lineStyle: { color: LINEC } } },
   dataZoom: [{ type: 'inside' }],
   series: [{
     type: 'bar', data: districtAvg.map(d => d[1]),
-    itemStyle: { color: '#37c6ff', borderRadius: [3, 3, 0, 0] }
+    itemStyle: { color: ACCENT, borderRadius: [4, 4, 0, 0], opacity: .85 }
   }]
 });
 
 // 图 3：面积-单价散点（VisualMap 颜色映射）
 charts.chart3 = echarts.init(document.getElementById('chart3'));
 charts.chart3.setOption({
-  ...dark,
-  tooltip: { ...dark.tooltip },
+  ...theme,
+  tooltip: { ...theme.tooltip },
   grid: { left: 60, right: 20, top: 20, bottom: 30 },
-  xAxis: { type: 'value', name: '面积(平米)', axisLabel: { color: '#8ea0c4' } },
-  yAxis: { type: 'value', name: '单价(元/平)', axisLabel: { color: '#8ea0c4' } },
+  xAxis: { type: 'value', name: '面积(平米)', axisLabel: { color: AXIS }, splitLine: { lineStyle: { color: LINEC } } },
+  yAxis: { type: 'value', name: '单价(元/平)', axisLabel: { color: AXIS }, splitLine: { lineStyle: { color: LINEC } } },
   visualMap: {
     min: 3000, max: 45000, dimension: 1,
-    inRange: { color: ['#37c6ff', '#f6c344', '#ff9c6e'] },
-    textStyle: { color: '#8ea0c4' }, show: false
+    inRange: { color: [ACCENT, GOLD, '#da6c4e'] },
+    textStyle: { color: AXIS }, show: false
   },
-  series: [{ type: 'scatter', data: scatterData, symbolSize: 6, itemStyle: { opacity: .8 } }]
+  series: [{ type: 'scatter', data: scatterData, symbolSize: 6, itemStyle: { opacity: .5, color: ACCENT } }]
 });
 
 // 图 6：宁波市行政区真实地图（边界：阿里云 DataV geoJSON；前湾新区无官方边界，不涂色）
 charts.chart6 = echarts.init(document.getElementById('chart6'));
 echarts.registerMap('ningbo', NINGBO_GEO);
 charts.chart6.setOption({
-  ...dark,
-  tooltip: { ...dark.tooltip, formatter: p => `${p.name}：${p.value != null && !isNaN(p.value) ? '均价 ' + p.value + ' 元/㎡，' + p.data.count + ' 套在售' : '无边界数据'}` },
+  ...theme,
+  tooltip: { ...theme.tooltip, formatter: p => `${p.name}：${p.value != null && !isNaN(p.value) ? '均价 ' + p.value + ' 元/㎡，' + p.data.count + ' 套在售' : '无边界数据'}` },
   visualMap: {
     min: 6000, max: 23000,
-    inRange: { color: ['#37c6ff', '#f6c344', '#ff9c6e'] },
-    textStyle: { color: '#8ea0c4' }
+    inRange: { color: ['#12233d', '#1f4a75', '#3d7fb8', '#79b8e8'] },
+    textStyle: { color: AXIS }
   },
   series: [{
     type: 'map', map: 'ningbo', roam: true,
     data: districtAvg.map(d => ({ name: d[0], value: d[1], count: d[2] })),
-    label: { show: true, color: '#e8eefc', fontSize: 10 },
-    itemStyle: { areaColor: '#1a2a55', borderColor: '#0f1c3f' },
-    emphasis: { label: { color: '#f6c344' } }
+    label: { show: true, color: TEXT, fontSize: 10 },
+    itemStyle: { areaColor: '#1c2530', borderColor: '#0d1117' },
+    emphasis: { label: { color: ACCENT, fontWeight: 'bold' } }
   }],
   graphic: [{
     type: 'text', right: 20, top: 10,
-    style: { text: '前湾新区无官方边界数据，未着色', fill: '#ff9c6e', fontSize: 12 }
+    style: { text: '前湾新区无官方边界数据，未着色', fill: GOLD, fontSize: 12 }
   }]
 });
 
 // 图 2：总价区间饼图
 charts.chart2 = echarts.init(document.getElementById('chart2'));
 charts.chart2.setOption({
-  ...dark,
-  tooltip: { ...dark.tooltip, trigger: 'item', formatter: '{b}: {c}套 ({d}%)' },
+  ...theme,
+  tooltip: { ...theme.tooltip, trigger: 'item', formatter: '{b}: {c}套 ({d}%)' },
   series: [{
-    type: 'pie', radius: ['35%', '65%'],
+    type: 'pie', radius: ['40%', '68%'],
     data: priceRanges,
-    label: { color: '#8ea0c4' },
-    itemStyle: { borderColor: '#16264d', borderWidth: 2 }
+    label: { color: AXIS },
+    itemStyle: { borderColor: CARD, borderWidth: 2 }
   }],
-  color: ['#37c6ff', '#f6c344', '#ff9c6e', '#8ea0c4', '#2f9fd8', '#d9a94a']
+  color: [ACCENT, '#3d7fb8', GOLD, '#484f58']
 });
 
 // 图 4：箱线图
 charts.chart4 = echarts.init(document.getElementById('chart4'));
 charts.chart4.setOption({
-  ...dark,
-  tooltip: { ...dark.tooltip, trigger: 'item' },
+  ...theme,
+  tooltip: { ...theme.tooltip, trigger: 'item' },
   grid: { left: 60, right: 10, top: 20, bottom: 40 },
-  xAxis: { type: 'category', data: districtAvg.map(d => d[0]), axisLabel: { color: '#8ea0c4', rotate: 30 } },
-  yAxis: { type: 'value', name: '元/㎡', axisLabel: { color: '#8ea0c4' } },
-  series: [{ type: 'boxplot', data: districtAvg.map(d => boxData[d[0]]), itemStyle: { color: '#16264d', borderColor: '#37c6ff' } }]
+  xAxis: { type: 'category', data: districtAvg.map(d => d[0]), axisLabel: { color: AXIS, rotate: 30 }, axisLine: { lineStyle: { color: LINEC } }, axisTick: { show: false } },
+  yAxis: { type: 'value', name: '元/㎡', axisLabel: { color: AXIS }, splitLine: { lineStyle: { color: LINEC } } },
+  series: [{ type: 'boxplot', data: districtAvg.map(d => boxData[d[0]]), itemStyle: { color: '#1c2530', borderColor: ACCENT } }]
 });
 
 // 图 5：相关性热力图
 charts.chart5 = echarts.init(document.getElementById('chart5'));
 charts.chart5.setOption({
-  ...dark,
-  tooltip: { ...dark.tooltip, formatter: p => `${corrLabels[p.value[0]]} × ${corrLabels[p.value[1]]}：${p.value[2].toFixed(4)}` },
+  ...theme,
+  tooltip: { ...theme.tooltip, formatter: p => `${corrLabels[p.value[0]]} × ${corrLabels[p.value[1]]}：${p.value[2].toFixed(4)}` },
   grid: { left: 90, right: 20, top: 20, bottom: 60 },
-  xAxis: { type: 'category', data: corrLabels, axisLabel: { color: '#8ea0c4', rotate: 30 } },
-  yAxis: { type: 'category', data: corrLabels, axisLabel: { color: '#8ea0c4' } },
+  xAxis: { type: 'category', data: corrLabels, axisLabel: { color: AXIS, rotate: 30 } },
+  yAxis: { type: 'category', data: corrLabels, axisLabel: { color: AXIS } },
   visualMap: {
     min: -1, max: 1, calculable: true,
-    inRange: { color: ['#37c6ff', '#16264d', '#ff9c6e'] },
-    textStyle: { color: '#8ea0c4' }, orient: 'horizontal', left: 'center', bottom: 0
+    inRange: { color: ['#12233d', '#1c2530', '#da6c4e'] },
+    textStyle: { color: AXIS }, orient: 'horizontal', left: 'center', bottom: 0
   },
   series: [{
     type: 'heatmap', data: corrData,
-    label: { show: true, color: '#e8eefc', formatter: p => p.value[2].toFixed(4) }
+    label: { show: true, color: TEXT, formatter: p => p.value[2].toFixed(4) }
   }]
 });
 
