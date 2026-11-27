@@ -29,7 +29,7 @@ KPI_HTML = """
   .kpi.gold .value { color:#f6c344; } .kpi.cyan .value { color:#37c6ff; }
 </style>
 <div class="kpi-row">
-  <div class="kpi cyan"><div class="label">在售房源总数</div><div class="value">{total} 套</div></div>
+  <div class="kpi cyan"><div class="label">在售房源（清洗后）</div><div class="value">{total} 套</div></div>
   <div class="kpi gold"><div class="label">全市平均单价</div><div class="value">{avg} 元/平</div></div>
   <div class="kpi gold"><div class="label">单价中位数</div><div class="value">{median} 元/平</div></div>
   <div class="kpi cyan"><div class="label">覆盖行政区</div><div class="value">{districts} 个</div></div>

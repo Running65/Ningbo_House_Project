@@ -26,13 +26,25 @@ GREY = "#8ea0c4"
 
 
 def load_data() -> pd.DataFrame:
-    """读取并清洗原始数据，返回含「单价/面积值/总价」数值列的 DataFrame。"""
-    df = pd.read_csv(CSV_PATH, encoding="utf-8-sig")
-    df["单价"] = pd.to_numeric(
-        df["单价(元/平)"].astype(str).str.replace(",", ""), errors="coerce")
-    df["面积值"] = pd.to_numeric(
-        df["面积"].astype(str).str.replace("平米", ""), errors="coerce")
-    df["总价"] = pd.to_numeric(df["总价(万)"], errors="coerce")
+    """读取图表数据，含「单价/面积值/总价」数值列。
+
+    口径与 B 的 EDA 一致：优先读 data/processed/clean_data.csv（清洗后 1096 条）；
+    该文件不存在时回退到 raw_data.csv 自行清洗（口径同 dashboard_stats.py）。
+    """
+    clean_path = BASE_DIR / "data" / "processed" / "clean_data.csv"
+    if clean_path.exists():
+        df = pd.read_csv(clean_path, encoding="utf-8-sig")
+        df["单价"] = pd.to_numeric(df["单价(元/平)"], errors="coerce")
+        df["面积值"] = pd.to_numeric(df["面积(平米)"], errors="coerce")
+        df["总价"] = pd.to_numeric(df["总价(万)"], errors="coerce")
+    else:
+        print("警告：未找到 clean_data.csv，回退到原始数据（先运行 analysis/clean.py 可获得统一口径）")
+        df = pd.read_csv(CSV_PATH, encoding="utf-8-sig")
+        df["单价"] = pd.to_numeric(
+            df["单价(元/平)"].astype(str).str.replace(",", ""), errors="coerce")
+        df["面积值"] = pd.to_numeric(
+            df["面积"].astype(str).str.replace("平米", ""), errors="coerce")
+        df["总价"] = pd.to_numeric(df["总价(万)"], errors="coerce")
     df = df[(df["单价"] > 0) & (df["面积值"] > 0) & df["总价"].notna()]
     return df
 
@@ -75,10 +87,10 @@ def build_bar(df: pd.DataFrame) -> Bar:
 
 
 def build_pie(df: pd.DataFrame) -> Pie:
-    """图2：总价区间占比饼图（分箱口径与 B 对齐：≤80 / 80-150 / 150-300 / >300 万）。"""
-    bins = [(0, 80, "≤80万"), (80, 150, "80-150万"),
-            (150, 300, "150-300万"), (300, 10**9, ">300万")]
-    data = [{"name": n, "value": int(((df["总价"] > a) & (df["总价"] <= b)).sum())}
+    """图2：总价区间占比饼图（6 档左闭右开，与 B 的 analysis.py price_bins 口径一致）。"""
+    bins = [(0, 50, "50万以下"), (50, 100, "50-100万"), (100, 150, "100-150万"),
+            (150, 200, "150-200万"), (200, 300, "200-300万"), (300, 10**9, "300万以上")]
+    data = [{"name": n, "value": int(((df["总价"] >= a) & (df["总价"] < b)).sum())}
             for a, b, n in bins]
     return (
         Pie(init_opts=_init())

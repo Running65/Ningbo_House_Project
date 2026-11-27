@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# 成员C：从 raw_data.csv 计算大屏真实统计值（图表数据口径与B的字段设计表一致）
+# 成员C：计算大屏真实统计值（数据源=B 清洗后的 clean_data.csv，与 EDA 口径一致）
 import json, re
 import pandas as pd
 
-df = pd.read_csv('data/raw/raw_data.csv', encoding='utf-8-sig')
-df['单价'] = df['单价(元/平)'].astype(str).str.replace(',', '').astype(float)
-df['面积值'] = df['面积'].str.replace('平米', '').astype(float)
+df = pd.read_csv('data/processed/clean_data.csv', encoding='utf-8-sig')
+df['单价'] = df['单价(元/平)'].astype(float)
+df['面积值'] = df['面积(平米)'].astype(float)
 df = df[(df['单价'] > 0) & (df['面积值'] > 0)]
 
 stats = {}
@@ -18,9 +18,10 @@ stats['districts'] = int(df['行政区'].nunique())
 g = df.groupby('行政区')['单价'].agg(['mean', 'count']).sort_values('mean', ascending=False)
 stats['districtAvg'] = [[idx, round(r['mean']), int(r['count'])] for idx, r in g.iterrows()]
 
-# 图2：总价分箱（B建议口径 ≤80 / 80-150 / 150-300 / >300 万）
-bins = [(0, 80, '≤80万'), (80, 150, '80-150万'), (150, 300, '150-300万'), (300, 10**9, '>300万')]
-stats['priceRanges'] = [{'name': n, 'value': int(((df['总价(万)'] > a) & (df['总价(万)'] <= b)).sum())} for a, b, n in bins]
+# 图2：总价分箱（6 档，与 B 的 analysis.py price_bins 口径一致：左闭右开）
+bins = [(0, 50, '50万以下'), (50, 100, '50-100万'), (100, 150, '100-150万'),
+        (150, 200, '150-200万'), (200, 300, '200-300万'), (300, 10**9, '300万以上')]
+stats['priceRanges'] = [{'name': n, 'value': int(((df['总价(万)'] >= a) & (df['总价(万)'] < b)).sum())} for a, b, n in bins]
 
 # 图3：面积-单价散点（全量）
 stats['scatter'] = [[round(r['面积值'], 1), round(r['单价'])] for _, r in df.iterrows()]
@@ -44,7 +45,7 @@ with open('analysis/stats.json', 'w', encoding='utf-8') as f:
     json.dump(stats, f, ensure_ascii=False, indent=1)
 
 # 同步生成大屏引用的数据文件（analysis.py → 图表统计数据 的交付形式）
-js = "// 由 analysis/dashboard_stats.py 自动生成，勿手改；数据源 data/raw/raw_data.csv\n"
+js = "// 由 analysis/dashboard_stats.py 自动生成，勿手改；数据源 data/processed/clean_data.csv（B 清洗后口径，1096 条）\n"
 js += "const KPI = {total:%d, avgPrice:%d, medianPrice:%d, districts:%d};\n" % (
     stats['total'], stats['avgPrice'], stats['medianPrice'], stats['districts'])
 js += "const DISTRICT_AVG = %s;\n" % json.dumps(stats['districtAvg'], ensure_ascii=False)
