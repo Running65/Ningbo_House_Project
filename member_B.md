@@ -29,3 +29,8 @@
 - [x] clean.py（analysis/clean.py：数值提取、去重、缺失值、IQR 异常值处理）
 - [x] clean_data.csv（data/processed/，1195 行清洗后 1096 行）
 - [x] EDA 分析摘要（docs/EDA分析摘要_成员B.md）
+
+## 第四周交付物
+- [x] analysis.py（analysis/analysis.py：区域均价、总价区间、相关性、房价分布、性价比筛选）
+- [x] 图表统计数据（docs/图表统计数据_成员B.md，数据文件 data/processed/chart_stats/）
+- [x] 性价比房源筛选结果（data/processed/value_for_money.csv，131 条）
