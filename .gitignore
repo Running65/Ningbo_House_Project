@@ -1,5 +1,7 @@
 # 项目生成物（调试/中间文件，不提交）
 analysis/stats.json
+visualization/output/
+visualization/ningbo_dashboard.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
