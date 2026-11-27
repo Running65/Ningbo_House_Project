@@ -20,3 +20,7 @@
 - [x] 数据分析思路文档（docs/数据分析思路_成员B.md）
 - [x] 数据质量检查脚本（analysis/beginner_test.py）
 - [x] 数据质量报告（docs/数据质量报告_成员B.md）
+
+## 第二周交付物
+- [x] 原始数据质量检查表（docs/原始数据质量检查表_成员B.md）
+- [x] 字段统计结果（docs/字段统计结果_成员B.md，脚本 analysis/field_stats.py 可复现）
